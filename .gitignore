@@ -1,0 +1,9 @@
+debug/*
+release/*
+ipch/*
+*.exe
+*.dll
+Direct3D-Hook/Debug/*
+Direct3D-Hook/Release/*
+Launcher/Debug/*
+Launcher/Release/*
