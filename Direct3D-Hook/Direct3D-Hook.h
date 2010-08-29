@@ -6,5 +6,5 @@
 	#define D3DHOOK_API __declspec(dllimport)
 #endif
 
-D3DHOOK_API void InstallHook();
-D3DHOOK_API void RemoveHook();
+D3DHOOK_API void InstallDirect3DHook();
+D3DHOOK_API void RemoveDirect3DHook();

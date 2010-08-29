@@ -1,6 +1,6 @@
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "LeagueOverlay.cpp"
+#include "..\Overlay\Overlay.h"
 
 #pragma once
 
@@ -11,7 +11,8 @@ public:
 	// in functions like GetDirect3D9
 	MyDirect3DDevice9(IDirect3D9* d3d, IDirect3DDevice9* device) : m_d3d(d3d), m_device(device)
 	{
-		this->overlay = new LeagueOverlay(m_device);
+		this->overlay = new Overlay();
+		this->overlay->setDevice(device);
 	}
 
 	/*** IDirect3DDevice9 methods ***/
@@ -20,10 +21,17 @@ public:
 		SetVertexShader(0);
 		SetPixelShader(0);
 		SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-		SetRenderState(D3DRS_ZENABLE, false);
+		
+		SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
 		SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE); // important for drawprimitiveup
+		SetRenderState(D3DRS_ZENABLE, FALSE);
+		SetRenderState(D3DRS_LIGHTING, FALSE);
+		SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS); // important for drawing sprites to the top, must be reset
 		
+		SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 		SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 		SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 		SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
@@ -31,7 +39,8 @@ public:
 		
 		this->overlay->render();
 		
-		SetRenderState(D3DRS_ZENABLE, true);
+		SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL); // reset to default
+		SetRenderState(D3DRS_ZENABLE, TRUE); // reset to default
 
 		return m_device->EndScene();
 	}
@@ -641,5 +650,5 @@ private:
 	IDirect3DDevice9* m_device;	
 	IDirect3D9* m_d3d;
 
-	LeagueOverlay* overlay;
+	Overlay* overlay;
 };

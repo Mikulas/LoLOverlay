@@ -1,7 +1,28 @@
 #include <iostream>
 #include <windows.h>
 #include <TCHAR.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include "..\Input-Hook\Input-Hook.h"
 #include "..\Direct3D-Hook\Direct3D-Hook.h"
+#include "..\Overlay\Overlay.h"
+
+using namespace std;
+
+/*void mouseLeftClick() {
+	INPUT Input = {0};
+	// left down 
+	Input.type = INPUT_MOUSE;
+	Input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+	SendInput(1, &Input, sizeof(INPUT));
+
+	// left up
+	ZeroMemory(&Input, sizeof(INPUT));
+	Input.type = INPUT_MOUSE;
+	Input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+	SendInput(1, &Input, sizeof(INPUT));
+}*/
 
 int _tmain(int argc, TCHAR* argv[])
 {
@@ -12,9 +33,10 @@ int _tmain(int argc, TCHAR* argv[])
 		return 1;
 	}
 
-	// Create/update the registry entry
+
+	/* write to registry */
 	HKEY regKey = 0;
-	if(ERROR_SUCCESS != RegCreateKeyEx(HKEY_CURRENT_USER, L"Software\\Direct3D-Hook", 0, 0, 0, KEY_READ | KEY_WRITE, 0, &regKey, 0))
+	if(ERROR_SUCCESS != RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Direct3D-Hook", 0, 0, 0, KEY_READ | KEY_WRITE, 0, &regKey, 0))
 	{
 		std::cout << "Could not open or create registry key: HKEY_CURRENT_USER\\Software\\Direct3D-Hook" << std::endl << "Press enter to exit..." << std::endl;
 		std::cin.ignore();
@@ -27,14 +49,31 @@ int _tmain(int argc, TCHAR* argv[])
 		std::cin.ignore();
 		return 3;
 	}
+	/* end write to registry */
 
-	std::cout<< "Hooking Direct3D...";
-	InstallHook();
-	
-	std::cout<< "Done." << std::endl << "Press enter to unhook and exit." << std::endl;
+
+	/* hooks installation */
+	std::cout << "Hooking Direct3D " << std::endl;
+	InstallDirect3DHook();
+
+	std::cout << "Hooking Input " << std::endl << std::endl;
+	std::cout << "\toverlay is running ";
+	LRESULT res = InstallInputHook();
+	if (res == 1) {
+		std::cout << "Hooking keyboard failed." << std::endl;
+	} else if (res == 2) {
+		std::cout << "Hooking mouse failed." << std::endl;
+	}
 	std::cin.ignore();
+	/* end hooks installation */
 	
-	RemoveHook();
+	// NOW IT'S NOT POSSIBLE TO GET HERE DUE TO INFINITE LOOP IN INSTALLINPUTHOOK
+
+	/* hooks removal */
+	RemoveInputHook();
+	RemoveDirect3DHook();
+	/* endhooks removal */
+	
 
 	return 0;
 }

@@ -5,5 +5,9 @@ ipch/*
 *.dll
 Direct3D-Hook/Debug/*
 Direct3D-Hook/Release/*
+Input-Hook/Debug/*
+Input-Hook/Release/*
 Launcher/Debug/*
 Launcher/Release/*
+Overlay/Debug/*
+Overlay/Release/*
